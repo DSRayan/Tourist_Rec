@@ -1,4 +1,5 @@
 import streamlit as st
+pip install streamlit-option-menu==0.4.0
 from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np

@@ -8,13 +8,18 @@ import pydeck as pdk
 import gdown
 import pickle
 
+st.set_page_config(
+    page_title="Personalized Tourist Experience Recommender",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 @st.cache_data
 def download_and_load_model():
-    file_id = "1fTZrj0iYuG7NEhDHu2WYC_isDjPwhdTW"  # Replace with your Google Drive file ID
+    file_id = "1fTZrj0iYuG7NEhDHu2WYC_isDjPwhdTW"
     url = f"https://drive.google.com/uc?id={file_id}"
     output = "random_forest.pkl"
 
-    # Download the model file
     gdown.download(url, output, quiet=False)
 
     # Load the model
@@ -39,11 +44,6 @@ saudi_arabia_map = pdk.Deck(
     ),
 )
 
-st.set_page_config(
-    page_title="Personalized Tourist Experience Recommender",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 # Load data
 @st.cache_data
 def load_data():
@@ -290,7 +290,7 @@ with st.sidebar:
                 # Check if the user exists in the database
                 user_profile = db_manager.fetch_user_by_id(user_id)
                 if user_profile:
-                    username = user_profile[0]  # Fetch username from the database record
+                    username = user_profile[0]
                     st.session_state['user_id'] = user_id
                     st.session_state['tab'] = "Home"
                     st.success(f"Welcome {username}!")
@@ -312,7 +312,7 @@ with st.sidebar:
                     st.success("Account created successfully!")
                     st.session_state['user_id'] = user_id
                     st.session_state['tab'] = "Home"
-                    del st.session_state['new_user']  # Remove new user flag
+                    del st.session_state['new_user']
                 else:
                     st.error("Username cannot be empty.")
     elif 'user_id' in st.session_state:
@@ -321,9 +321,7 @@ with st.sidebar:
             st.session_state.clear()
             st.success("Logged out successfully!")
             st.stop()
-
-
-
+            
 selected = option_menu(
     menu_title=None,
     options=["Home", "Recommendation Engine", "Popular Attractions"],
@@ -405,7 +403,7 @@ elif selected == "Recommendation Engine":
             st.warning("No recommendations found for the selected filters.")
         else:
             # Generate feature inputs for the Random Forest model
-            svd_scores = np.random.rand(len(filtered_item_profiles))  # Example SVD scores
+            svd_scores = np.random.rand(len(filtered_item_profiles))
             user_features = np.array([activity_level] * 2).reshape(1, -1)
             item_features = filtered_item_profiles[['City_Sentiment_Score', 'Avg_City_Sentiment_Score']].values
             kbf_scores = cosine_similarity(user_features, item_features).flatten()
@@ -416,7 +414,7 @@ elif selected == "Recommendation Engine":
             })
 
             # Predict interaction probabilities
-            predictions = model.predict_proba(features)[:, 1]  # Probability of interaction
+            predictions = model.predict_proba(features)[:, 1]
             filtered_item_profiles['Predicted Score'] = predictions
 
             # Sort recommendations
@@ -431,6 +429,7 @@ elif selected == "Recommendation Engine":
                 recommendations['Rank'] = range(1, len(recommendations) + 1)
                 recommendations = recommendations[['Rank', 'Item_name', 'City', 'Item Category']]
                 st.markdown(recommendations.to_markdown(index=False))
+                
 elif selected == "Popular Attractions":
     st.write("### Explore the Popular Attractions")
     attraction_name = st.selectbox("Select an Attraction:", most_pop['Item_name'])

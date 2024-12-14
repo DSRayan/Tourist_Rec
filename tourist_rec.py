@@ -361,8 +361,7 @@ elif selected == "Recommendation Engine":
             user_profile = existing_user_profiles[existing_user_profiles['User ID'].str.lower() == user_id].iloc[0]
             activity_level = user_profile['activity_level']
             preferred_province = user_profile['Province'] if 'Province' in user_profile else 'All'
-            category_of_interest = user_profile[
-                'Category of Interest'] if 'Category of Interest' in user_profile else 'All'
+            category_of_interest = user_profile['Category of Interest'] if 'Category of Interest' in user_profile else 'All'
         else:
             user_profile = db_manager.fetch_user_by_id(user_id)
             if user_profile:
@@ -408,16 +407,22 @@ elif selected == "Recommendation Engine":
             item_features = filtered_item_profiles[['City_Sentiment_Score', 'Avg_City_Sentiment_Score']].values
             kbf_scores = cosine_similarity(user_features, item_features).flatten()
 
+            # Calculate Hybrid Score
+            svd_weight  = 0.6
+            kbf_weight  = 0.4
             features = pd.DataFrame({
                 'SVD Score': svd_scores,
                 'KBF Score': kbf_scores
             })
+            features['Hybrid Score'] = svd_weight * features['SVD Score'] + kbf_weight * features['KBF Score']
+
+            filtered_item_profiles['Hybrid Score'] = features['Hybrid Score'].values
 
             # Predict interaction probabilities
-            predictions = model.predict_proba(features)[:, 1]
+            predictions = model.predict_proba(features[['SVD Score', 'KBF Score']])[:, 1]
             filtered_item_profiles['Predicted Score'] = predictions
 
-            # Sort recommendations
+            # Sort recommendations by Predicted Score
             recommendations = filtered_item_profiles.sort_values(by='Predicted Score', ascending=False).head(5)
 
             # Display recommendations
@@ -427,9 +432,10 @@ elif selected == "Recommendation Engine":
                 recommendations['Item_name'] = recommendations['Item ID_tourist'].map(item_name_mapping)
                 recommendations['Item Category'] = recommendations['Item_name'].map(category_mapping)
                 recommendations['Rank'] = range(1, len(recommendations) + 1)
-                recommendations = recommendations[['Rank', 'Item_name', 'City', 'Item Category']]
+                # Include Hybrid Score in the table
+                recommendations = recommendations[['Rank', 'Item_name', 'City', 'Item Category', 'Hybrid Score']]
                 st.markdown(recommendations.to_markdown(index=False))
-                
+
 elif selected == "Popular Attractions":
     st.write("### Explore the Popular Attractions")
     attraction_name = st.selectbox("Select an Attraction:", most_pop['Item_name'])

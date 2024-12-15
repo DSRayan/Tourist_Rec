@@ -432,7 +432,7 @@ elif selected == "Recommendation Engine":
                 recommendations['Item_name'] = recommendations['Item ID_tourist'].map(item_name_mapping)
                 recommendations['Item Category'] = recommendations['Item_name'].map(category_mapping)
                 recommendations['Rank'] = range(1, len(recommendations) + 1)
-                recommendations = recommendations[['Rank', 'Item_name', 'City', 'Item Category', 'Hybrid Score']]
+                recommendations = recommendations[['Rank', 'Item_name', 'City', 'Item Category']]
                 st.markdown(recommendations.to_markdown(index=False))
 
 elif selected == "Popular Attractions":

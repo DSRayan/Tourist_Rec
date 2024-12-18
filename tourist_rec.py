@@ -398,7 +398,9 @@ elif selected == "Recommendation Engine":
             filtered_item_profiles['Item Category'] = filtered_item_profiles['Item_name'].map(category_mapping)
             filtered_item_profiles = filtered_item_profiles[filtered_item_profiles['Item Category'] == category_filter]
 
-        if filtered_item_profiles.empty:
+        regenerate = st.button("Regenerate Recommendations")
+
+        if regenerate or filtered_item_profiles.empty:
             st.warning("No recommendations found for the selected filters.")
         else:
             # Generate feature inputs for the Random Forest model

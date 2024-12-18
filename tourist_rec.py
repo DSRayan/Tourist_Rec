@@ -400,8 +400,9 @@ elif selected == "Recommendation Engine":
 
         regenerate = st.button("Regenerate Recommendations")
 
-        if regenerate or filtered_item_profiles.empty:
-            st.warning("No recommendations found for the selected filters.")
+        if regenerate:
+            if filtered_item_profiles.empty:
+                st.warning("No recommendations found for the selected filters.")
         else:
             # Generate feature inputs for the Random Forest model
             svd_scores = np.random.rand(len(filtered_item_profiles))

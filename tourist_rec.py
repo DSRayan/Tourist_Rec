@@ -435,6 +435,13 @@ elif selected == "Recommendation Engine":
                 recommendations = recommendations[['Rank', 'Item_name', 'City', 'Item Category']]
                 st.markdown(recommendations.to_markdown(index=False))
 
+                csv_data = recommendations.to_csv(index=False)
+                st.download_button(
+                label="Download Recommendations as CSV",
+                data=csv_data,
+                file_name="recommendations.csv",
+                mime="text/csv"
+
 elif selected == "Popular Attractions":
     st.write("### Explore the Popular Attractions")
     attraction_name = st.selectbox("Select an Attraction:", most_pop['Item_name'])

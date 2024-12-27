@@ -440,7 +440,7 @@ elif selected == "Recommendation Engine":
                 label="Download Recommendations as CSV",
                 data=csv_data,
                 file_name="recommendations.csv",
-                mime="text/csv"
+                mime="text/csv")
 
 elif selected == "Popular Attractions":
     st.write("### Explore the Popular Attractions")

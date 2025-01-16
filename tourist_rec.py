@@ -376,18 +376,18 @@ elif selected == "Recommendation Engine":
         filtered_item_profiles = item_profiles.copy()
 
         # Add filtering options
+        province_options = ['All'] + list(filtered_item_profiles['Province'].dropna().unique())
         province_filter = st.selectbox(
             "Filter by Province:",
-            options=['All'] + list(filtered_item_profiles['Province'].dropna().unique()),
-            index=['All'] + list(filtered_item_profiles['Province'].dropna().unique()).index(preferred_province)
-            if preferred_province in list(filtered_item_profiles['Province'].dropna().unique()) else 0
+            options=province_options,
+            index=province_options.index(preferred_province) if preferred_province in province_options else 0
         )
 
+        category_options = ['All'] + sorted(set(category_mapping.values()))
         category_filter = st.selectbox(
             "Filter by Category:",
-            options=['All'] + sorted(set(category_mapping.values())),
-            index=['All'] + sorted(set(category_mapping.values())).index(category_of_interest)
-            if category_of_interest in set(category_mapping.values()) else 0
+            options=category_options,
+            index=category_options.index(category_of_interest) if category_of_interest in category_options else 0
         )
 
         if province_filter != 'All':
@@ -408,8 +408,8 @@ elif selected == "Recommendation Engine":
             kbf_scores = cosine_similarity(user_features, item_features).flatten()
 
             # Calculate Hybrid Score
-            svd_weight  = 0.6
-            kbf_weight  = 0.4
+            svd_weight = 0.6
+            kbf_weight = 0.4
             features = pd.DataFrame({
                 'SVD Score': svd_scores,
                 'KBF Score': kbf_scores
@@ -437,10 +437,12 @@ elif selected == "Recommendation Engine":
 
                 csv_data = recommendations.to_csv(index=False)
                 st.download_button(
-                label="Download Recommendations as CSV",
-                data=csv_data,
-                file_name="recommendations.csv",
-                mime="text/csv")
+                    label="Download Recommendations as CSV",
+                    data=csv_data,
+                    file_name="recommendations.csv",
+                    mime="text/csv"
+                )
+
 
 elif selected == "Popular Attractions":
     st.write("### Explore the Popular Attractions")

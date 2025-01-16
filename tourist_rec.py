@@ -14,6 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
 @st.cache_data
 def download_and_load_model():
     file_id = "1fTZrj0iYuG7NEhDHu2WYC_isDjPwhdTW"
@@ -27,6 +28,7 @@ def download_and_load_model():
         model = pickle.load(f)
 
     return model
+
 
 # Load the model
 model = download_and_load_model()
@@ -44,6 +46,7 @@ saudi_arabia_map = pdk.Deck(
     ),
 )
 
+
 # Load data
 @st.cache_data
 def load_data():
@@ -52,6 +55,7 @@ def load_data():
     final_combined_df1 = pd.read_csv('data/final_combined_df1.csv')
     most_pop = pd.read_csv('data/Most_Pop.csv', encoding='latin1')
     return existing_user_profiles, item_profiles, final_combined_df1, most_pop
+
 
 # Load datasets
 existing_user_profiles, item_profiles, final_combined_df1, most_pop = load_data()
@@ -235,6 +239,7 @@ category_mapping = {
     "Al Madinah Museum - Hejaz Railway Railway Museum - متحف السكة الحديد": "Cultural & Heritage Sites"
 }
 
+
 # Fetch new users from the SQLite database
 def fetch_new_users():
     db_user_profiles = pd.DataFrame(
@@ -242,6 +247,7 @@ def fetch_new_users():
         columns=['username', 'user_id', 'preferred_province', 'category_of_interest', 'activity_level']
     )
     return db_user_profiles
+
 
 # Set default tab to Home
 if 'tab' not in st.session_state:
@@ -302,13 +308,16 @@ with st.sidebar:
         if 'new_user' in st.session_state and st.session_state['new_user']:
             st.write("### New User Account Creation")
             new_username = st.text_input("Enter Username:")
-            new_preferred_province = st.selectbox("Preferred Province:", ['All'] + list(item_profiles['Province'].dropna().unique()))
-            new_category_of_interest = st.selectbox("Category of Interest:", ['All'] + list(set(category_mapping.values())))
+            new_preferred_province = st.selectbox("Preferred Province:",
+                                                  ['All'] + list(item_profiles['Province'].dropna().unique()))
+            new_category_of_interest = st.selectbox("Category of Interest:",
+                                                    ['All'] + list(set(category_mapping.values())))
             new_activity_level = st.slider("Activity Level (1 to 5):", min_value=1, max_value=5, value=3)
 
             if st.button("Create Account"):
                 if new_username:
-                    db_manager.insert_user(new_username, user_id, new_preferred_province, new_category_of_interest, new_activity_level)
+                    db_manager.insert_user(new_username, user_id, new_preferred_province, new_category_of_interest,
+                                           new_activity_level)
                     st.success("Account created successfully!")
                     st.session_state['user_id'] = user_id
                     st.session_state['tab'] = "Home"
@@ -321,7 +330,7 @@ with st.sidebar:
             st.session_state.clear()
             st.success("Logged out successfully!")
             st.stop()
-            
+
 selected = option_menu(
     menu_title=None,
     options=["Home", "Recommendation Engine", "Popular Attractions"],
@@ -346,7 +355,7 @@ if selected == "Home":
     st.markdown("### *Discover Saudi Arabia's Best Attractions!*")
     st.image("images/banar.jpg", use_container_width=True)
     st.markdown(" **Saudi Arabia is a land of beauty and culture. The Kingdom has become one of the most important"
-             " tourist destinations in the world due to its distinguished geographical location and rich cultural heritage.**")
+                " tourist destinations in the world due to its distinguished geographical location and rich cultural heritage.**")
     st.pydeck_chart(saudi_arabia_map)
 
 elif selected == "Recommendation Engine":
@@ -361,7 +370,8 @@ elif selected == "Recommendation Engine":
             user_profile = existing_user_profiles[existing_user_profiles['User ID'].str.lower() == user_id].iloc[0]
             activity_level = user_profile['activity_level']
             preferred_province = user_profile['Province'] if 'Province' in user_profile else 'All'
-            category_of_interest = user_profile['Category of Interest'] if 'Category of Interest' in user_profile else 'All'
+            category_of_interest = user_profile[
+                'Category of Interest'] if 'Category of Interest' in user_profile else 'All'
         else:
             user_profile = db_manager.fetch_user_by_id(user_id)
             if user_profile:

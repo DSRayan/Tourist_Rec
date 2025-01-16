@@ -1,7 +1,7 @@
 import sqlite3
 import time
 
-DB_FILE = "user_profiles.db"
+DB_FILE = "new_user_profiles.db"
 
 def get_connection(timeout=10):
     """
@@ -12,12 +12,12 @@ def get_connection(timeout=10):
 
 def create_table():
     """
-    Creates the user_profiles table if it does not exist.
+    Creates the new_user_profiles table if it does not exist.
     """
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-        CREATE TABLE IF NOT EXISTS user_profiles (
+        CREATE TABLE IF NOT EXISTS new_user_profiles (
             username TEXT NOT NULL,
             user_id TEXT PRIMARY KEY,
             preferred_province TEXT,
@@ -29,7 +29,7 @@ def create_table():
 
 def insert_user(username, user_id, preferred_province, category_of_interest, activity_level):
     """
-    Inserts a new user into the user_profiles table.
+    Inserts a new user into the new_user_profiles table.
     Implements retries to handle potential database locks.
     """
     for attempt in range(5):  # Retry up to 5 times
@@ -37,7 +37,7 @@ def insert_user(username, user_id, preferred_province, category_of_interest, act
             with get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                INSERT INTO user_profiles (username, user_id, preferred_province, category_of_interest, activity_level)
+                INSERT INTO new_user_profiles (username, user_id, preferred_province, category_of_interest, activity_level)
                 VALUES (?, ?, ?, ?, ?)
                 """, (username, user_id, preferred_province, category_of_interest, activity_level))
                 conn.commit()
@@ -51,18 +51,18 @@ def insert_user(username, user_id, preferred_province, category_of_interest, act
 
 def fetch_all_users():
     """
-    Fetches all users from the user_profiles table.
+    Fetches all users from the new_user_profiles table.
     """
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user_profiles")
+        cursor.execute("SELECT * FROM new_user_profiles")
         return cursor.fetchall()
 
 def fetch_user_by_id(user_id):
     """
-    Fetches a user by user_id from the user_profiles table.
+    Fetches a user by user_id from the new_user_profiles table.
     """
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user_profiles WHERE user_id = ?", (user_id,))
+        cursor.execute("SELECT * FROM new_user_profiles WHERE user_id = ?", (user_id,))
         return cursor.fetchone()
